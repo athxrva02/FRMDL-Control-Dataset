@@ -1,0 +1,28 @@
+# Configuration for the JPEG re-encoding confound control dataset.
+# Every scope knob lives here; scripts must not hard-code these values.
+# Any key can be overridden on the CLI (see each script's --help).
+
+seed: 0                       # master seed for image selection + per-array seeding
+n_images: 500                 # base images sampled from ImageNette val, stratified over 10 classes
+
+severities: [1, 3, 5]         # imagecorruptions severity levels (valid range 1..5)
+jpeg_qualities: [75, 90]      # swept JPEG qualities
+
+# JPEG quality used by the real ImageNet-C creation script
+# (make_imagenet_c.py: `Image.fromarray(...).save(save_path, quality=85, optimize=True)`).
+# Discovered from github.com/hendrycks/robustness, not assumed. It is unioned into the
+# swept qualities above and labelled as the ImageNet-C default in outputs.
+imagenet_c_default_quality: 85
+
+# Data + output locations (relative to repo root).
+data_dir: data
+results_dir: results
+imagenette_url: https://s3.amazonaws.com/fast-ai-imageclas/imagenette2-320.tgz
+imagenette_dirname: imagenette2-320   # directory name inside the tarball
+imagenet_class_index_url: https://s3.amazonaws.com/deep-learning-models/image-models/imagenet_class_index.json
+
+# Models evaluated (torchvision names; weights enums resolved in evaluate.py).
+models: [alexnet, resnet50, convnext_tiny]
+
+# Inference batch size (one image's full set of arms is batched together anyway).
+batch_size: 184
