@@ -34,14 +34,30 @@ if [ -n "$FRESH" ]; then
   rm -rf data/base data/clean_saves data/corrupted results manifest.csv
 fi
 
-echo "[run_all] 1/3 generate  -> logs/generate.log"
-$PY src/generate.py "${NIMG_ARG[@]}" 2>&1 | tee logs/generate.log | grep -aE \
-  "^\[|SUMMARY|PNG files|JPEG files|skipped|corruptions OK|corruptions FAILED|disk usage" || true
+# Run a stage: capture full output to a log (so its exit code is checked directly,
+# not masked by a pipe into grep), then print a filtered summary. ${arr[@]+...} is
+# the bash-3.2-safe way to expand a possibly-empty array under `set -u`.
+run_stage() {  # $1=label  $2=logfile  $3=summary-regex ; remaining args = command
+  local label="$1" log="$2" re="$3"; shift 3
+  echo "[run_all] $label -> $log"
+  if ! "$@" > "$log" 2>&1; then
+    echo "[run_all] FAILED: $label  (last 25 lines of $log)"
+    tail -25 "$log"
+    exit 1
+  fi
+  grep -aE "$re" "$log" || true
+}
 
-echo "[run_all] 2/3 evaluate  -> logs/evaluate.log"
-$PY src/evaluate.py 2>&1 | tee logs/evaluate.log | grep -aE "^\[model\]|^\[done\]|^\[labels\]" || true
+run_stage "1/3 generate" logs/generate.log \
+  "^\[|SUMMARY|PNG files|JPEG files|skipped|corruptions OK|corruptions FAILED|disk usage" \
+  $PY src/generate.py ${NIMG_ARG[@]+"${NIMG_ARG[@]}"}
 
-echo "[run_all] 3/3 analyze   -> logs/analyze.log"
-$PY src/analyze.py 2>&1 | tee logs/analyze.log | grep -aE "^\[" || true
+run_stage "2/3 evaluate" logs/evaluate.log \
+  "^\[model\]|^\[done\]|^\[labels\]" \
+  $PY src/evaluate.py
+
+run_stage "3/3 analyze" logs/analyze.log \
+  "^\[" \
+  $PY src/analyze.py
 
 echo "[run_all] complete. Results in results/ (CSVs + figures/). Logs in logs/."

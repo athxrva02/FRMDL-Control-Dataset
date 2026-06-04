@@ -1,3 +1,28 @@
+## Assignment Information
+Assignment: Control dataset [individual] (15% of the grade)
+Students will submit a blog post with a motivation of why their control dataset precisely tests a particular property, where the property is motivated with a link to one or multiple relevant papers. The blog should include a description of the control dataset with some examples, and how the dataset was generated; this should include links to the dataset and the code that was used to generate the dataset (e.g. on github/gitlab). 
+
+Rubric: Penalties for the Control-dataset (blog):
+
+- Not enough effort shown.
+- Motivation is not sufficiently explained.
+- No link to ML/DL research paper(s)
+- Not clear how the control-dataset matches the motivation.
+- No examples shown.
+- Not explained how the data is generated.
+
+Rubric: Penalties for all Writing (Storyline and blogs):
+
+- Using a term before defining/motivating it.
+- Too much unnecessary detail: words can be removed without significantly changing the storyline. Each word should have a reason to be there. 
+- Unclear logical reasoning step.
+- Inconsistent use of terminology. Use a single term for a single concept; 1-to-1.
+- Writing too verbose / full sentences: bullet point should be one-two lines, one sentence, grammar optional
+- Too many topics per storyline bullet point 
+- Too many storyline bullet points. 
+- The text is not stand-alone; it's not peer understandable.
+
+
 ### The JPEG re-encoding confound dataset
 
 **Property and motivation.** ImageNet-C contains an admitted, unquantified confound. On page 3 the paper states that ImageNet-C images are saved as lightly compressed JPEGs, so an image corrupted by Gaussian noise is also slightly corrupted by JPEG compression. The benchmark therefore never measures the corruption _c_ in isolation; it measures _JPEG(c(x))_. The property your dataset would test is precisely this: how much of each corruption's reported Corruption Error is attributable to the named corruption versus the JPEG save step, and does this leakage differ across corruption types? This maps directly onto experimental question 5a in your storyline ("is the score fair and unbiased?").
